@@ -1,6 +1,7 @@
 package main
 
 import (
+	"bufio"
 	"context"
 	"fmt"
 	"log"
@@ -29,18 +30,20 @@ func greeting(firstStart *bool) {
 }
 
 func prompt(model *genai.GenerativeModel, ctx *context.Context) {
-	var query string
 	fmt.Println(">")
-	_, err := fmt.Scanln(&query)
+	scanner := bufio.NewScanner(os.Stdin)
+	scanner.Scan()
+	err := scanner.Err()
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	if query == "quit" {
+	if scanner.Text() == "quit" {
+		fmt.Println("Shutting down REPL...")
 		return
 	}
 
-	resp, err := model.GenerateContent(*ctx, genai.Text(query))
+	resp, err := model.GenerateContent(*ctx, genai.Text(scanner.Text()))
 	if err != nil {
 		log.Fatal(err)
 		fmt.Println("error")
